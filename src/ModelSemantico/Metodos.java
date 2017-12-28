@@ -18,14 +18,18 @@ public class Metodos {
     private String tipo;
     private ArrayList parametrosNome;
     private ArrayList parametrosTipo;
+    private ArrayList variaveisLocais;
+
+  
     
     public Metodos(boolean privado, String nome, String tipo, ArrayList parametrosNome,
-            ArrayList parametrosTipo){
+            ArrayList parametrosTipo, ArrayList variaveisLocais){
         this.privado = privado;
         this.nome = nome;
         this.tipo = tipo;
         this.parametrosTipo = parametrosTipo;
         this.parametrosNome = parametrosNome;
+        this.variaveisLocais = variaveisLocais;
     }
 
     /**
@@ -96,5 +100,13 @@ public class Metodos {
      */
     public void setParametrosTipo(ArrayList parametrosTipo) {
         this.parametrosTipo = parametrosTipo;
+    }
+    
+    public ArrayList getVariaveisLocais() {
+        return variaveisLocais;
+    }
+
+    public void setVariaveisLocais(ArrayList variaveisLocais) {
+        this.variaveisLocais = variaveisLocais;
     }
 }
