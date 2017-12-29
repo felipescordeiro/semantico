@@ -25,10 +25,14 @@ public class Start {
         File archive[];
         File directory = new File ("saida/");
         archive = directory.listFiles();
+        //System.out.println("tamanho : " + archive.length);
         
         for(int i = 0; i < archive.length; i++){
-            semantico.start(archive[i].getName());
+        	System.out.println(" " + archive[i].getName());
+        	semantico.start(archive[i].getName());
             //semantico.printLine();
+           //semantico.printVariable();
+            semantico.printMetodos();
         }
     }
 }

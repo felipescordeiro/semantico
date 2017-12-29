@@ -67,7 +67,7 @@ public class ArquivoLexico {
             writer.write(tokens.get(i).toString() + "\r\n");
         }
         if(!erro){
-            writer.write("\r\n\r\n Arquivo Sem Erro - Sucesso");
+          //  writer.write("\r\n\r\n Arquivo Sem Erro - Sucesso");
         }
         writer.close();
         lerArq.close();

@@ -41,6 +41,9 @@ public class AnalisadorSemantico {
         dataLineMap = new HashMap<Integer, ArrayList<String>>();
         pilha = new Stack();
         
+        variaveisGlobais = new ArrayList<>();
+        variaveisLocal = new ArrayList<>();
+        metodos = new ArrayList<>();
         readFiles(nameArchive);
         parser();
     }
@@ -57,7 +60,8 @@ public class AnalisadorSemantico {
                 while (line != null) {
 
                     if(!line.contains("ERRO") && !line.contains("MAL")){
-                        token = line.split("-")[2];
+                        
+                    	token = line.split("-")[2];
                         String numberLine = line.split("-")[0];
                         numberLine = numberLine.replaceAll(" ", "");
                         int number = Integer.parseInt(numberLine);    
@@ -97,39 +101,188 @@ public class AnalisadorSemantico {
     }
     
     public void parser(){
-        System.out.println("FOI" + " " + lastNumber);
-        
+       
         for(int i = 1; i <= lastNumber; i++){
           
             if(dataLineMap.containsKey(i)){
-                System.out.println("linha: " + i + "  dado linha " + dataLineMap.get(i));
+               // System.out.println("linha: " + i + "  dado linha " + dataLineMap.get(i));
                 for(int j = 0; j < tokenMap.get(i).size(); j++){
                     if(tokenMap.get(i).get(j).contains("DELIMITADOR")){
-                        pilha.add(dataLineMap.get(i).get(j));
-                    }else if(tokenMap.get(i).get(j).contains("RESERVADA")){
-                        switch(dataLineMap.get(i).get(j)){
-                            case "class": break;
-                            case "final": break;
-                            case "if": break;
-                            case "else": break;
-                            case "for": break;
-                            case "scan": break;
-                            case "print": break;
-                            case "float": break;
-                            case "bool": break;
-                            case "main": break;
-                            case "true": break;
-                            case "false": break;
-                            case "string": break;
-                                                
-                                                
+                        
+                        if(dataLineMap.get(i).get(j).contains(":")){ //criar metodos
+                           novoMetodo(i, j);
+                           j++;
+                        }else {
+                        	pilha.add(dataLineMap.get(i).get(j));
                         }
+                    }else if(tokenMap.get(i).get(j).contains("RESERVADA")){
+                        if(dataLineMap.get(i).get(j).contains("class")){
+                            classe(i, j);
+                        }else if(dataLineMap.get(i).get(j).contains("final")){
+                        }else if(dataLineMap.get(i).get(j).contains("if")){
+                        }else if(dataLineMap.get(i).get(j).contains("else")){
+                        }else if(dataLineMap.get(i).get(j).contains("for")){
+                        }else if(dataLineMap.get(i).get(j).contains("scan")){
+                        }else if(dataLineMap.get(i).get(j).contains("print")){
+                        }else if(dataLineMap.get(i).get(j).contains("int")){ 
+                            nextWord(i, j);
+                        }else if(dataLineMap.get(i).get(j).contains("float")){
+                            nextWord(i, j);
+                        }else if(dataLineMap.get(i).get(j).contains("bool")){
+                            nextWord(i, j);
+                        }else if(dataLineMap.get(i).get(j).contains("main")){
+                        }else if(dataLineMap.get(i).get(j).contains("true")){
+                            nextWord(i, j);
+                        }else if(dataLineMap.get(i).get(j).contains("false")){
+                            nextWord(i, j);
+                        }else if(dataLineMap.get(i).get(j).contains("string")){
+                            nextWord(i, j);
+                        }
+                        
                     }
+                   
                 }
             }
         }
     }
     
+    private void novoMetodo(int i, int j) {
+       int x = j + 2;
+       
+       String nome = null;
+       String tipo = null;
+       ArrayList parametroNome = new ArrayList();;
+       ArrayList parametroTipo = new ArrayList();
+        //for(int x = j +1; x < tokenMap.get(i).size(); x++){
+            if(tokenMap.get(i).get(x).contains("IDENTIFICADOR")){
+                
+                    if(tokenMap.get(i).get(x + 1).contains("IDENTIFICADOR")){
+                        nome = dataLineMap.get(i).get(x + 1);
+                        for(int w = x +2; w < tokenMap.get(i).size(); w++){
+                            if(tokenMap.get(i).get(w).contains("RESERVADA")){
+                                parametroTipo.add(dataLineMap.get(i).get(w));
+                            }else if(tokenMap.get(i).get(w).contains("IDENTIFICADOR")){
+                                parametroNome.add(dataLineMap.get(i).get(w));
+                            }
+                        }
+                    }else if(tokenMap.get(i).get(x + 1).contains("RESERVADA")){
+                       nome = dataLineMap.get(i).get(x + 1);
+                        for(int w = x +2; w < tokenMap.get(i).size(); w++){
+                            if(tokenMap.get(i).get(w).contains("RESERVADA")){
+                                parametroTipo.add(dataLineMap.get(i).get(w));
+                            }else if(tokenMap.get(i).get(w).contains("IDENTIFICADOR")){
+                                parametroNome.add(dataLineMap.get(i).get(w));
+                            }
+                        }
+                    }else{
+                        nome = dataLineMap.get(i).get(x);
+                        for(int w = x +2; w < tokenMap.get(i).size(); w++){
+                            if(tokenMap.get(i).get(w).contains("RESERVADA")){
+                                parametroTipo.add(dataLineMap.get(i).get(w));
+                            }else if(tokenMap.get(i).get(w).contains("IDENTIFICADOR")){
+                                parametroNome.add(dataLineMap.get(i).get(w));
+                            }
+                        }
+                    }
+            }else if(tokenMap.get(i).get(x).contains("RESERVADA")){
+            	tipo = dataLineMap.get(i).get(x);
+            	if(tokenMap.get(i).get(x + 1).contains("RESERVADA")){
+                    nome = dataLineMap.get(i).get(x + 1);
+                     for(int w = x +2; w < tokenMap.get(i).size(); w++){
+                         if(tokenMap.get(i).get(w).contains("RESERVADA")){
+                             parametroTipo.add(dataLineMap.get(i).get(w));
+                         }else if(tokenMap.get(i).get(w).contains("IDENTIFICADOR")){
+                             parametroNome.add(dataLineMap.get(i).get(w));
+                         }
+                     }
+                  }else{
+                      nome = dataLineMap.get(i).get(x);
+                      for(int w = x +2; w < tokenMap.get(i).size(); w++){
+                          if(tokenMap.get(i).get(w).contains("RESERVADA")){
+                              parametroTipo.add(dataLineMap.get(i).get(w));
+                          }else if(tokenMap.get(i).get(w).contains("IDENTIFICADOR")){
+                              parametroNome.add(dataLineMap.get(i).get(w));
+                          }
+                      }
+                  }
+            }else{
+                nome = dataLineMap.get(i).get(x);
+                for(int w = x +2; w < tokenMap.get(i).size(); w++){
+                    if(tokenMap.get(i).get(w).contains("RESERVADA")){
+                        parametroTipo.add(dataLineMap.get(i).get(w));
+                    }else if(tokenMap.get(i).get(w).contains("IDENTIFICADOR")){
+                        parametroNome.add(dataLineMap.get(i).get(w));
+                    }
+                }
+            }
+            if(tipo == null){
+            	tipo = "void";
+            }
+            
+            if(!dataLineMap.get(i).get(tokenMap.get(i).size() -1).contains(";") ){
+            	inserirMetodo(true, nome, tipo, parametroNome, parametroTipo);
+            }
+        //}
+    }
+    
+    /*public void parametro(int i, int j){
+        for(int x = j +1; x < tokenMap.get(i).size(); x++){
+            if(tokenMap.get(i).get(x + 1).contains("RESERVADA")){
+                
+            }
+        }
+    }*/
+    
+    public void classe(int i, int j){
+        String nome = null;
+        String tipo = null;
+        for(int x = i; x <= lastNumber; x++){
+          
+            if(dataLineMap.containsKey(x)){
+               // System.out.println("linha: " + i + "  dado linha " + dataLineMap.get(i));
+                for(int z = 0; z < tokenMap.get(x).size(); z++){
+                   //* if(tokenMap.get(i).get(x).contains("IDENTIFICADOR")){
+                      //  if(tokenMap.get(i).get(x).contains("DELIMITADOR")){
+                            
+                       // }
+                    //}
+                }
+            }
+        }
+        novaClasse(true, nome , tipo);
+    }
+    
+    public void nextWord(int i, int j){
+       
+        for(int x = j +1; x < tokenMap.get(i).size(); x++){
+           // System.out.println(x + " " + dataLineMap.get(i).get(x) + " " +tokenMap.get(i).get(x));
+            if(tokenMap.get(i).get(x).contains("IDENTIFICADOR")){
+               if(tokenMap.get(i).get(x -1 ).contains("RESERVADA") || dataLineMap.get(i).get(x - 1 ).contains(",")){
+                    inserirVariavelGlobal(false, dataLineMap.get(i).get(j), dataLineMap.get(i).get(x));
+                }
+            }
+        }
+    }
+    
+      void printMetodos() {
+    	  System.out.println();
+       for(int i = 0; i < metodos.size(); i++){
+            System.out.println("nome: " + metodos.get(i).getNome() + 
+                    " tipo " + metodos.get(i).getTipo());
+            for(int j = 0; j < metodos.get(i).getParametrosNome().size(); j++){
+            System.out.println("nome parametro: " + metodos.get(i).getParametrosNome().get(j) + 
+                    " tipo parametro: " + metodos.get(i).getParametrosTipo().get(j));    
+            }
+        }
+    }
+    
+    public void printVariable(){
+      
+        for(int i = 0; i < variaveisGlobais.size(); i++){
+            System.out.println("token: " + variaveisGlobais.get(i).getVariavelGlobalTipo() + 
+                    " dado " + variaveisGlobais.get(i).getVariavelGlobalNome());
+        }
+    }
     public void printLine(){
 		
         for(int i = 1; i <= lastNumber; i++){
@@ -159,12 +312,16 @@ public class AnalisadorSemantico {
     
     public void inserirVariavelMetodo(boolean isPravado,String tipo, String nome){
         Variavel variavel = new Variavel(tipo, nome, isPravado);
-        variaveisGlobais.add(variavel);
+        variaveisLocal.add(variavel);
     }
-    public void inserirMetodo(boolean privado, String nome, String tipo, ArrayList parametrosNome){
-        variaveisLocal = new ArrayList<>();
-        Metodos metodo = new Metodos(privado, nome, tipo, parametrosNome, parametrosNome, variaveisLocal);
-        metodos.add(metodo);
+    public void inserirMetodo(boolean privado, String nome, String tipo, ArrayList parametrosNome, ArrayList parametrosTipo){
+    
+    	if(buscaMetodo(nome, tipo, parametrosNome.size())){
+	    	variaveisLocal = new ArrayList<>();
+	        Metodos metodo = new Metodos(privado, nome, tipo, parametrosNome, parametrosTipo, variaveisLocal);
+	        metodos.add(metodo);
+	        System.out.println("nome " + nome + " tipo " + tipo + " parametros " + parametrosNome.size());
+    	}
     }
     
     public boolean buscaVariavel(){
@@ -172,11 +329,26 @@ public class AnalisadorSemantico {
         return false;
     }
     
-    public boolean buscaMetodo(){
+    public boolean buscaMetodo(String nome, String tipo, int j){
         
-        return false;
+    	for(int i = 0; i < metodos.size(); i++){
+    		if(metodos.get(i).getNome().equals(nome)){
+    			if(metodos.get(i).getTipo().equals(tipo)){
+    				if(metodos.get(i).getParametrosNome().size() == j){
+    	    			return false;
+    	    		}
+        		}
+    		}
+    	}
+    	
+        return true;
     }
+
+  
+
     
+
+   
     
     
     
